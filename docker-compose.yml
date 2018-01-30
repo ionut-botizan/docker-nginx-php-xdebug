@@ -1,0 +1,31 @@
+version: "2"
+
+services:
+    web:
+        image: nginx:latest
+        ports:
+            - "80:80"
+        volumes:
+            - ./apps/default:/apps/default
+            - ./logs/nginx:/logs/nginx
+            - ./config/nginx/xdebug:/etc/nginx/xdebug
+            - ./config/nginx/hosts:/etc/nginx/hosts
+            - ./config/nginx/init.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - php-network
+    php:
+        build:
+            dockerfile: Dockerfile
+            context: ./
+        volumes:
+            - ./apps/default:/apps/default
+            - ./logs/xdebug:/logs/xdebug
+            - ./config/php/custom.conf:/usr/local/etc/php-fpm.d/zz-custom.conf
+            - ./config/php/xdebug.ini:/usr/local/etc/php/conf.d/zz-xdebug.ini
+            - ./logs/php-fpm/:/tmp/xdebug_log
+        networks:
+            - php-network
+
+networks:
+    php-network:
+        driver: bridge
